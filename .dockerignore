@@ -1,0 +1,8 @@
+# The image needs only the game, the graphics layer and the build scripts.
+*
+!adarkroom
+!graphics
+!scripts/build-game.sh
+!scripts/patch-index.mjs
+!nginx.conf
+adarkroom/.git
