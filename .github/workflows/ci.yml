@@ -1,7 +1,7 @@
 # Tests the package and plays the game on every push, then builds the s9pk
-# with Start9's standard build: one per architecture, attached to the run as
-# artifacts. On master, a new version in startos/versions/current.ts also
-# becomes a GitHub release with both s9pks (scripts/release.sh).
+# with Start9's standard build: one universal s9pk (Makefile TARGETS),
+# attached to the run as an artifact. On master, a new version in startos/versions/current.ts also
+# becomes a GitHub release with the s9pk (scripts/release.sh).
 name: CI
 
 on:

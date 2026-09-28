@@ -28,7 +28,7 @@ case "$1 $2" in
 esac
 `
 
-function run(state, files = ['adarkroom-graphics_x86_64.s9pk', 'adarkroom-graphics_aarch64.s9pk']) {
+function run(state, files = ['adarkroom-graphics.s9pk']) {
   const dir = mkdtempSync(join(tmpdir(), 'release-'))
   writeFileSync(join(dir, 'gh'), FAKE_GH)
   chmodSync(join(dir, 'gh'), 0o755)
@@ -58,11 +58,11 @@ function run(state, files = ['adarkroom-graphics_x86_64.s9pk', 'adarkroom-graphi
   return { ...res, calls: read('calls').trim().split('\n'), notes: read('notes') }
 }
 
-test('a new version is released as a draft, then published, with both s9pks', () => {
+test('a new version is released as a draft, then published, with the s9pk', () => {
   const r = run('none')
   assert.equal(r.status, 0, r.stderr)
   assert.match(r.calls[0], /^release view v1\.4\.0_2 /)
-  assert.match(r.calls[1], /^release create v1\.4\.0_2 .*_x86_64\.s9pk .*_aarch64\.s9pk --draft --target abc123 --title A Dark Room \(Graphics\) 1\.4\.0:2 /)
+  assert.match(r.calls[1], /^release create v1\.4\.0_2 \S*\/adarkroom-graphics\.s9pk --draft --target abc123 --title A Dark Room \(Graphics\) 1\.4\.0:2 /)
   assert.equal(r.calls[2], 'release edit v1.4.0_2 --draft=false --latest')
   assert.equal(r.calls.length, 3)
 })
@@ -71,9 +71,15 @@ test('the release notes carry what is new, install steps and checksums', () => {
   const { notes } = run('none')
   assert.match(notes, /## What's new\n\nBrighter fires\./)
   assert.match(notes, /Sideload/)
-  assert.match(notes, /`adarkroom-graphics_x86_64\.s9pk`: most servers/)
-  assert.match(notes, /`adarkroom-graphics_aarch64\.s9pk`: ARM/)
-  assert.match(notes, /[0-9a-f]{64} {2}adarkroom-graphics_x86_64\.s9pk/)
+  assert.match(notes, /`adarkroom-graphics\.s9pk`: every StartOS server/)
+  assert.match(notes, /keep the tab open until the service appears/)
+  assert.match(notes, /[0-9a-f]{64} {2}adarkroom-graphics\.s9pk/)
+})
+
+test('per-architecture s9pks are labelled for their servers', () => {
+  const { notes } = run('none', ['adarkroom-graphics_x86_64.s9pk', 'adarkroom-graphics_aarch64.s9pk'])
+  assert.match(notes, /`adarkroom-graphics_x86_64\.s9pk`: Intel or AMD servers only/)
+  assert.match(notes, /`adarkroom-graphics_aarch64\.s9pk`: ARM servers only/)
 })
 
 test('a version already released is left alone', () => {

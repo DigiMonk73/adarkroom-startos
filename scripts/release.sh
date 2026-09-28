@@ -40,16 +40,20 @@ trap 'rm -f "$NOTES"' EXIT
   echo
   echo "## Install"
   echo
-  echo "Download the file for your server, then in StartOS choose **Sideload** and pick it."
+  echo "Download the file, then in StartOS choose **Sideload** and pick it."
   echo
   for f in "$@"; do
     name=$(basename "$f")
     case "$name" in
-      *_x86_64.s9pk) echo "- \`$name\`: most servers and PCs (Intel or AMD)" ;;
-      *_aarch64.s9pk) echo "- \`$name\`: ARM, such as a Raspberry Pi" ;;
-      *) echo "- \`$name\`" ;;
+      *_x86_64.s9pk) echo "- \`$name\`: Intel or AMD servers only" ;;
+      *_aarch64.s9pk) echo "- \`$name\`: ARM servers only, such as a Raspberry Pi" ;;
+      *) echo "- \`$name\`: every StartOS server (Intel, AMD or ARM)" ;;
     esac
   done
+  echo
+  echo "After **Install**, StartOS returns to Services while the file uploads in the background:"
+  echo "keep the tab open until the service appears. If it never does, **System > OS Logs**"
+  echo "says why (search for \"sideload\")."
   echo
   echo "## SHA256"
   echo

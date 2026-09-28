@@ -74,21 +74,24 @@ repository holding `.startos/`):
 git submodule update --init
 npm ci
 start-cli s9pk init-workspace ..   # once
-make                               # adarkroom-graphics_x86_64.s9pk and _aarch64.s9pk
-make x86 install                   # build for x86 and install on the workspace's device
+make                               # adarkroom-graphics.s9pk, both architectures
+make install                       # install it on the workspace's device
 ```
 
-`make universal` builds one `adarkroom-graphics.s9pk` with both architectures.
-Sideloading it in StartOS (**Sideload** in the top bar) works too.
+`make` builds the universal package (`TARGETS := universal` in the
+`Makefile`): one file that installs on every server, so a sideload can't
+pick the wrong architecture. `make x86` or `make arm` builds a single
+architecture. Sideloading in StartOS (**Sideload** in the top bar) works too;
+StartOS returns to Services while the file uploads, and a failed install
+shows only in **System > OS Logs**.
 
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every push: the package checks and unit
 tests, then the game tests (Playwright) against the Docker image, then
 Start9's standard s9pk build. Each run's **Artifacts** hold
-`adarkroom-graphics_x86_64.s9pk` and `adarkroom-graphics_aarch64.s9pk`
-(kept 14 days); a failed game test leaves a `playwright-report` artifact
-with screenshots and traces.
+`adarkroom-graphics.s9pk` (kept 14 days); a failed game test leaves a
+`playwright-report` artifact with screenshots and traces.
 
 ## Releasing
 
@@ -98,7 +101,7 @@ A release is a version bump that reaches `master`:
    all five locales (see "The package version" above).
 2. Merge it to `master`. When every CI job passes, the **Release** job runs
    `scripts/release.sh`: it creates the GitHub release `v<version>` (Start9's
-   tag format: `1.4.0:1` becomes `v1.4.0_1`) with both s9pks, the release
+   tag format: `1.4.0:1` becomes `v1.4.0_1`) with the s9pk, the release
    notes, sideload instructions and SHA256 sums.
 
 Pushes to `master` that don't change the version release nothing: the job
