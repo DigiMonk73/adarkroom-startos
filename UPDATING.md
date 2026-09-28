@@ -87,23 +87,35 @@ Sideloading it in StartOS (**Sideload** in the top bar) works too.
 tests, then the game tests (Playwright) against the Docker image, then
 Start9's standard s9pk build. Each run's **Artifacts** hold
 `adarkroom-graphics_x86_64.s9pk` and `adarkroom-graphics_aarch64.s9pk`
-(kept 14 days) to sideload; a failed game test leaves a `playwright-report`
-artifact with screenshots and traces.
+(kept 14 days); a failed game test leaves a `playwright-report` artifact
+with screenshots and traces.
 
 ## Releasing
 
-On each push to `master`, Start9's **Tag and Release** workflow tags the
-version and makes a GitHub release with the s9pks when that version is new.
-It stays off until these exist on this repository:
+A release is a version bump that reaches `master`:
 
-- **Secret `DEV_KEY`**: the package signing key, an Ed25519 PEM
-  (`openssl genpkey -algorithm ed25519 -out adarkroom-dev.key.pem`). Keep the
-  key offline; every release must be signed by the same one.
-- **Variable `REFERENCE_REGISTRY`**: the registry that counts as already
-  released, e.g. `https://community-registry.start9.com`. Leave
-  `RELEASE_REGISTRY` unset to only make GitHub releases.
+1. Raise the version in `startos/versions/current.ts`, with release notes in
+   all five locales (see "The package version" above).
+2. Merge it to `master`. When every CI job passes, the **Release** job runs
+   `scripts/release.sh`: it creates the GitHub release `v<version>` (Start9's
+   tag format: `1.4.0:1` becomes `v1.4.0_1`) with both s9pks, the release
+   notes, sideload instructions and SHA256 sums.
+
+Pushes to `master` that don't change the version release nothing: the job
+sees the release exists and stops. To release from another branch, run the
+CI workflow by hand (**Actions → CI → Run workflow**) with **release**
+ticked.
+
+Signing: the s9pks are signed with the `DEV_KEY` repository secret when it
+exists, otherwise with a new throwaway key per build. StartOS sideloads and
+updates either way, but a registry accepts a package only from its known
+signer, so add one stable key before publishing to a registry: create it
+with `openssl genpkey -algorithm ed25519 -out adarkroom-dev.key.pem`, keep
+it offline, and paste the whole file into a repository secret named
+`DEV_KEY`.
 
 To list the package on Start9's community registry, email
 <submissions@start9.com>: Start9 forks this repository into Start9-Community,
-and from then on changes go to their fork as pull requests
+adds its standard release workflows there, and from then on changes go to
+their fork as pull requests
 ([Publishing](https://docs.start9.com/packaging/publishing.html)).

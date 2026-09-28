@@ -19,6 +19,7 @@
 
 - **Upstream repo:** <https://github.com/doublespeakgames/adarkroom> (the `adarkroom` submodule)
 - **Wrapper repo:** <https://github.com/DigiMonk73/adarkroom-startos> (the package and the graphics layer)
+- **Downloads:** the s9pks for each version are on the [Releases](https://github.com/DigiMonk73/adarkroom-startos/releases) page (sideload in StartOS)
 
 ---
 

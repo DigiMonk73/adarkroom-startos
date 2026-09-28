@@ -2,6 +2,7 @@
 // Sanity checks on the bundled manifest (run after `npm run build`): the
 // things that would break existing installs or ship the wrong package if they
 // drifted.
+import { appendFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
@@ -25,6 +26,8 @@ for (const key of ['short', 'long']) {
   const locales = Object.keys(m.description?.[key] ?? {}).sort().join(',')
   check(locales === 'de_DE,en_US,es_ES,fr_FR,pl_PL', `description.${key} locales are ${locales}`)
 }
+const noteLocales = Object.keys(m.releaseNotes ?? {}).sort().join(',')
+check(noteLocales === 'de_DE,en_US,es_ES,fr_FR,pl_PL', `release notes locales are ${noteLocales}`)
 check(!('alerts' in m), 'alerts was removed in start-sdk 2.0')
 
 if (errors.length) {
@@ -32,3 +35,9 @@ if (errors.length) {
   process.exit(1)
 }
 console.log(`manifest ok: ${m.id} ${m.version}`)
+
+// In CI: the version, title and release notes, for the release job.
+if (process.env.GITHUB_OUTPUT) {
+  const notes = m.releaseNotes?.en_US ?? ''
+  appendFileSync(process.env.GITHUB_OUTPUT, `version=${m.version}\ntitle=${m.title}\nnotes<<NOTES_EOF\n${notes}\nNOTES_EOF\n`)
+}

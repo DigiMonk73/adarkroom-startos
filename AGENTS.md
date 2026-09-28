@@ -39,6 +39,10 @@ Don't record work in the repo instead: no `TODO.md`, no `NOTES.md`, no `PLAN.md`
 - **i18n:** every package string goes through `i18n()`, with `es_ES`, `de_DE`, `pl_PL` and
   `fr_FR` translations in `startos/i18n/dictionaries/translations.ts`. The graphics layer's
   own menu text goes through the game's `_()`.
+- **Releases come from CI, not Start9's release workflows:** a new version in
+  `startos/versions/current.ts` merged to `master` becomes a GitHub release with both s9pks
+  (`scripts/release.sh`, once per version). Start9's tag-and-release workflows need a signing
+  key and a registry; Start9 adds them on its fork if the package is submitted.
 - **Checks** (all run by `.github/workflows/ci.yml` on every push, which then builds the
   s9pk): `npm run check && npm run lint && npm run build && node scripts/check-manifest.mjs &&
   npm run format:check`, `npm test` (unit tests: `tests/unit/`), and `npm run test:game`

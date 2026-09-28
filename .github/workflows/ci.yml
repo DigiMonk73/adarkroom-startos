@@ -1,6 +1,7 @@
 # Tests the package and plays the game on every push, then builds the s9pk
 # with Start9's standard build: one per architecture, attached to the run as
-# artifacts (download one and sideload it in StartOS).
+# artifacts. On master, a new version in startos/versions/current.ts also
+# becomes a GitHub release with both s9pks (scripts/release.sh).
 name: CI
 
 on:
@@ -11,6 +12,11 @@ on:
     branches: ['master']
     paths-ignore: ['*.md', 'docs/**']
   workflow_dispatch:
+    inputs:
+      release:
+        description: Also release this version from the chosen branch (pushes to master always do)
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -21,6 +27,10 @@ jobs:
     name: Package checks
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.manifest.outputs.version }}
+      title: ${{ steps.manifest.outputs.title }}
+      notes: ${{ steps.manifest.outputs.notes }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -33,7 +43,9 @@ jobs:
       - run: npm run check
       - run: npm run lint
       - run: npm run build
-      - run: node scripts/check-manifest.mjs
+      - name: Manifest guard (also hands the version to the release job)
+        id: manifest
+        run: node scripts/check-manifest.mjs
       - run: npm run format:check
       - name: Graphics layer parses
         run: for f in graphics/js/*.js; do node --check "$f"; done
@@ -93,3 +105,27 @@ jobs:
     uses: Start9Labs/start-technologies/.github/workflows/build.yml@master
     secrets:
       DEV_KEY: ${{ secrets.DEV_KEY }}
+
+  release:
+    name: Release
+    needs: [package, game, s9pk]
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Collect the s9pks
+        uses: actions/download-artifact@v8
+        with:
+          pattern: '*.s9pk'
+          merge-multiple: true
+          path: dist
+      - name: Release this version, unless it already is
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.package.outputs.version }}
+          TITLE: ${{ needs.package.outputs.title }}
+          RELEASE_NOTES: ${{ needs.package.outputs.notes }}
+        run: scripts/release.sh "$VERSION" "$GITHUB_SHA" dist/*.s9pk
