@@ -78,7 +78,11 @@ export async function embark(page) {
     Path.outfit['bone spear'] = 1
     Path.embark()
   })
-  await page.waitForFunction(() => Engine.activeModule === World && document.querySelector('canvas.gfx-world'))
+  // The map slides in over 300ms (Path.embark animates #outerSlider): wait for
+  // it to settle, or a click measured mid-slide lands where the map no longer is.
+  await page.waitForFunction(
+    () => Engine.activeModule === World && document.querySelector('canvas.gfx-world') && !$('#outerSlider').is(':animated'),
+  )
 }
 
 /** Mean brightness (0–255) of a canvas, and the share of its pixels that are drawn. */

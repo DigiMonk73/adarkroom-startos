@@ -14,9 +14,11 @@ test('the world map is drawn as tiles over the text map', async ({ page }) => {
 test('clicking the map walks the wanderer that way', async ({ page }) => {
   await openMidGame(page)
   await embark(page)
-  const box = await page.locator(MAP).boundingBox()
+  const map = page.locator(MAP)
+  const { width } = await map.boundingBox()
   const start = await page.evaluate(() => World.curPos.slice())
-  await page.mouse.click(box.x + box.width / 2, box.y + 30) // straight above the wanderer
+  // Relative to the canvas, resolved at click time once it is stable.
+  await map.click({ position: { x: width / 2, y: 30 } }) // straight above the wanderer
   await expect.poll(() => page.evaluate(() => World.curPos.slice())).toEqual([start[0], start[1] - 1])
 })
 
