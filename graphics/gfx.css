@@ -1,0 +1,115 @@
+/*
+ * A Dark Room — graphics layer styles. Everything is scoped to body.gfx so
+ * turning graphics off restores the stock look. The page itself uses the
+ * game's own dark.css, which the layer switches on.
+ */
+
+/* Scene canvases sit behind the panel's text and buttons. */
+body.gfx canvas.gfx-scene {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Graphics replace the lights toggle: the scenes are painted for the dark. */
+body.gfx .menu .lightsOff {
+  display: none;
+}
+
+/* Buttons and boxes float over the scenes, so give them a backing.
+   z-index 0 keeps each button's cooldown bar (z-index -1) inside it. */
+body.gfx div.button {
+  z-index: 0;
+  background-color: rgba(28, 27, 24, 0.82);
+}
+body.gfx div.button div.cooldown {
+  background-color: #5a5044;
+}
+body.gfx div#stores,
+body.gfx div#weapons,
+body.gfx div#village,
+body.gfx div#workers {
+  background-color: rgba(39, 40, 35, 0.9);
+}
+body.gfx div#workers {
+  padding: 2px 6px;
+}
+body.gfx div#buildBtns:before,
+body.gfx div#craftBtns:before,
+body.gfx div#buyBtns:before {
+  text-shadow: 0 0 4px #000, 0 0 2px #000;
+}
+
+/* World map: the ASCII map stays underneath for layout and logic. */
+body.gfx #map,
+body.gfx #map .landmark {
+  color: transparent;
+}
+body.gfx canvas.gfx-world {
+  position: absolute;
+  z-index: 2;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+/* Combat */
+body.gfx #fight {
+  height: 88px;
+}
+body.gfx .fighter > .label {
+  display: none;
+}
+body.gfx canvas.gfx-fighter {
+  display: block;
+  image-rendering: pixelated;
+  transition: filter 120ms, transform 300ms, opacity 300ms;
+}
+body.gfx .fighter.shield canvas.gfx-fighter {
+  filter: drop-shadow(0 0 2px #8ec5ff) drop-shadow(0 0 5px #8ec5ff);
+}
+body.gfx .fighter.enraged canvas.gfx-fighter {
+  filter: drop-shadow(0 0 3px #ff4a3a) saturate(1.4);
+  transform: scale(1.1);
+}
+body.gfx .fighter.energised canvas.gfx-fighter {
+  filter: drop-shadow(0 0 4px #ffd24a);
+  transform: scale(1.15);
+}
+body.gfx .fighter.venomous canvas.gfx-fighter {
+  filter: drop-shadow(0 0 3px #8be04a);
+}
+body.gfx .fighter.boost canvas.gfx-fighter {
+  filter: drop-shadow(0 0 3px #ffffff);
+}
+body.gfx .fighter.meditation canvas.gfx-fighter {
+  opacity: 0.35;
+}
+body.gfx .fighter.exploding canvas.gfx-fighter {
+  animation: exploding 200ms linear infinite;
+}
+body.gfx canvas.gfx-fighter.gfx-hit {
+  animation: gfx-hit 260ms linear;
+}
+@keyframes gfx-hit {
+  0% { filter: brightness(3) sepia(1) hue-rotate(-40deg) saturate(6); transform: translateX(-4px); }
+  30% { transform: translateX(4px); }
+  60% { transform: translateX(-2px); }
+  100% { filter: none; transform: translateX(0); }
+}
+body.gfx canvas.gfx-fighter.gfx-dead {
+  transform: rotate(90deg) translateX(20px);
+  opacity: 0.4;
+}
+body.gfx #description .bullet {
+  color: #ffcf70;
+  font-weight: bold;
+  text-shadow: 0 0 6px #ff9a30;
+}
+body.gfx .fighter > .hp {
+  left: 0;
+  width: 100%;
+  margin-left: 0;
+  text-align: center;
+}

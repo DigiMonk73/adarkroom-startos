@@ -1,6 +1,11 @@
 *.s9pk
-procedures/*.js
+startos/*.js
 node_modules/
 .DS_Store
 .vscode/
 docker-images
+javascript
+ncc-cache
+build/
+tests/test-results/
+tests/playwright-report/

@@ -2,22 +2,29 @@
   "name": "adarkroom-startos",
   "scripts": {
     "build": "rm -rf ./javascript && ncc build startos/index.ts -o ./javascript",
+    "check": "tsc --noEmit",
+    "lint": "node node_modules/@start9labs/start-sdk/lint.mjs",
     "prettier": "prettier --write startos",
-    "check": "tsc --noEmit"
+    "format:check": "prettier --check startos",
+    "test": "node --test 'tests/unit/*.test.mjs'",
+    "test:game": "npm --prefix tests test"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "0.3.6-beta.1"
+    "@start9labs/start-sdk": "2.0.9"
   },
   "devDependencies": {
-    "@types/node": "^22.1.0",
-    "@vercel/ncc": "^0.38.1",
-    "prettier": "^3.2.5",
-    "typescript": "^5.4.3"
+    "@types/node": "^22.19.20",
+    "@vercel/ncc": "^0.44.0",
+    "prettier": "^3.8.4",
+    "typescript": "^6.0.3"
   },
   "prettier": {
     "trailingComma": "all",
     "tabWidth": 2,
     "semi": false,
     "singleQuote": true
+  },
+  "overrides": {
+    "@start9labs/start-sdk": "$@start9labs/start-sdk"
   }
 }

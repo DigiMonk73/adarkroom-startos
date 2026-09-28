@@ -1,29 +1,16 @@
-# Use the latest stable Node.js version
-FROM node:20-alpine
+# A Dark Room with the graphics layer, served as static files by nginx.
+# Build context is the repository root, with the adarkroom submodule checked
+# out (git submodule update --init).
 
-# Set the working directory inside the container
-WORKDIR /app
+# The site is plain files, the same for every architecture: assemble it once,
+# natively on the build machine, so the arm64 image needs no emulation.
+FROM --platform=$BUILDPLATFORM node:22-alpine AS site
+WORKDIR /src
+COPY adarkroom/ adarkroom/
+COPY graphics/ graphics/
+COPY scripts/build-game.sh scripts/patch-index.mjs scripts/
+RUN sh scripts/build-game.sh adarkroom /site
 
-# Copy only the necessary files into the container
-COPY ./adarkroom . 
-
-# Install dependencies
-RUN npm install
-
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Create the data directory and set proper permissions
-RUN mkdir -p /app/data && chown -R node:node /app/data
-
-# Set user to non-root for security
-USER node
-
-# Declare the volume for persistent storage
-VOLUME /app/data
-
-# Expose the correct port (8081)
-EXPOSE 8081
-
-# Define the default command to run the application
-CMD ["npm", "start"]
+FROM nginx:1.28-alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=site /site /usr/share/nginx/html
