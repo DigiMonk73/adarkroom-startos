@@ -11,6 +11,10 @@ concurrency:
 
 jobs:
   tag:
+    # Off until releases are set up: the secret DEV_KEY and the variable
+    # REFERENCE_REGISTRY (UPDATING.md, "Releasing"). Until then every push to
+    # master still gets tested and its s9pk built by ci.yml.
+    if: vars.REFERENCE_REGISTRY != ''
     uses: Start9Labs/start-technologies/.github/workflows/tagAndRelease.yml@master
     with:
       REFERENCE_REGISTRY: ${{ vars.REFERENCE_REGISTRY }}

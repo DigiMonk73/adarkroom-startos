@@ -39,5 +39,13 @@ Don't record work in the repo instead: no `TODO.md`, no `NOTES.md`, no `PLAN.md`
 - **i18n:** every package string goes through `i18n()`, with `es_ES`, `de_DE`, `pl_PL` and
   `fr_FR` translations in `startos/i18n/dictionaries/translations.ts`. The graphics layer's
   own menu text goes through the game's `_()`.
-- **Checks:** `npm run check && npm run lint && npm run build && npx prettier --check startos`,
-  and `docker build .`.
+- **Checks** (all run by `.github/workflows/ci.yml` on every push, which then builds the
+  s9pk): `npm run check && npm run lint && npm run build && node scripts/check-manifest.mjs &&
+  npm run format:check`, `npm test` (unit tests: `tests/unit/`), and `npm run test:game`
+  (Playwright plays the game: `tests/e2e/`; first `cd tests && npm ci && npx playwright
+  install chromium`). Unset `BASE_URL`, the game tests
+  assemble and serve the game themselves; CI runs them against the Docker image with
+  `CHECK_IMAGE=1`, which adds the nginx header checks.
+- **The game tests fail on any page error, console error, request leaving the server, or
+  graphics scene that disabled itself** (`tests/e2e/fixtures.js`). A new scene or feature gets
+  a spec; an upstream enemy is covered automatically by `combat.spec.js`.

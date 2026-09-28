@@ -7,3 +7,5 @@ docker-images
 javascript
 ncc-cache
 build/
+tests/test-results/
+tests/playwright-report/

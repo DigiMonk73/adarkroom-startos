@@ -23,7 +23,8 @@ git -C adarkroom log --oneline HEAD..origin/main   # what is new upstream
    git add adarkroom
    ```
 
-2. Play-test with `scripts/dev.sh` (below). `scripts/patch-index.mjs` stops
+2. Run the tests (`npm test`, `npm run test:game`) and play-test with
+   `scripts/dev.sh` (below). `scripts/patch-index.mjs` stops
    the build if upstream's `index.html` no longer has the pieces it edits;
    update the patterns there if so. If upstream renamed a function the
    graphics layer wraps (`Room.onFireChange`, `World.drawMap`,
@@ -80,11 +81,20 @@ make x86 install                   # build for x86 and install on the workspace'
 `make universal` builds one `adarkroom-graphics.s9pk` with both architectures.
 Sideloading it in StartOS (**Sideload** in the top bar) works too.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push: the package checks and unit
+tests, then the game tests (Playwright) against the Docker image, then
+Start9's standard s9pk build. Each run's **Artifacts** hold
+`adarkroom-graphics_x86_64.s9pk` and `adarkroom-graphics_aarch64.s9pk`
+(kept 14 days) to sideload; a failed game test leaves a `playwright-report`
+artifact with screenshots and traces.
+
 ## Releasing
 
-The workflows in `.github/workflows/` are Start9's standard ones: a build on
-every pull request to `master`, and on each push to `master` a tag and GitHub
-release when the version is new. They need, on this repository:
+On each push to `master`, Start9's **Tag and Release** workflow tags the
+version and makes a GitHub release with the s9pks when that version is new.
+It stays off until these exist on this repository:
 
 - **Secret `DEV_KEY`**: the package signing key, an Ed25519 PEM
   (`openssl genpkey -algorithm ed25519 -out adarkroom-dev.key.pem`). Keep the

@@ -5,7 +5,9 @@
     "check": "tsc --noEmit",
     "lint": "node node_modules/@start9labs/start-sdk/lint.mjs",
     "prettier": "prettier --write startos",
-    "format:check": "prettier --check startos"
+    "format:check": "prettier --check startos",
+    "test": "node --test 'tests/unit/*.test.mjs'",
+    "test:game": "npm --prefix tests test"
   },
   "dependencies": {
     "@start9labs/start-sdk": "2.0.9"
